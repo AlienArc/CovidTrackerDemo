@@ -1,0 +1,161 @@
+﻿@page "/"
+@inherits ViewModelComponentBase<HomeViewModel>
+
+<PageTitle>Covid Tracker</PageTitle>
+
+@if(ViewModel.DailyTotals == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <MudStack>
+        <MudText>Covid Statistics</MudText>
+
+        <MudDataGrid T="StateDailyTotal" Items="@ViewModel.DailyTotals" Filterable="true" FilterMode="@DataGridFilterMode.ColumnFilterMenu">
+            <Columns>
+                <PropertyColumn Property="x => x.Date" Title="Date" Sortable="true">
+                    <FilterTemplate>
+                        <MudStack Spacing="0">
+                            <MudDatePicker @ref="_datePicker" 
+                                PickerVariant="PickerVariant.Static" Date="ViewModel.CurrentDate" />
+                            <MudStack Row="true">
+                                <MudButton OnClick="@(() => ClearFilterAsync(context))">Cancel</MudButton>
+                                <MudButton Color="@Color.Primary" OnClick="SetDate">Pick Date</MudButton>
+                            </MudStack>
+                        </MudStack>
+                    </FilterTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.State" Title="State" Sortable="true">
+                     <FilterTemplate>
+                        @* <MudIconButton OnClick="@OpenFilter" Icon="@_icon" Size="@Size.Small" /> *@
+                        @* <MudOverlay OnClick="@(() => _filterOpen = false)" /> *@
+@*                         <MudPopover AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Style="width:150px"> *@
+                            <MudStack Spacing="0">
+                                <MudCheckBox T="bool" Label="Select All" Size="@Size.Small" Value="@_selectAll" ValueChanged="@SelectAll" />
+                                <MudStack Spacing="0" Style="overflow-y:auto;max-height:250px">
+                                    @foreach (var item in context.Items)
+                                    {
+                                        <MudCheckBox T="bool" Label="@($"{item.State}")" Size="@Size.Small" Value="@(_selectedItems.Contains(item))"
+                                                     ValueChanged="@((value) => SelectedChanged(value, item))" />
+                                    }
+                                </MudStack>
+                                <MudStack Row="true">
+                                    <MudButton OnClick="@(() => ClearFilterAsync(context))">Clear</MudButton>
+                                    <MudButton Color="@Color.Primary" OnClick="@(() => ApplyFilterAsync(context))">Filter</MudButton>
+                                </MudStack>
+                            </MudStack>
+                        @* </MudPopover> *@
+                     </FilterTemplate>
+
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.TotalCases" Title="Total" Sortable="true" Filterable="false" />
+                <PropertyColumn Property="x => x.PositiveCases" Title="Positive" Sortable="true" Filterable="false" />
+                <PropertyColumn Property="x => x.NegativeCases" Title="Negative" Sortable="true" Filterable="false" />
+                <PropertyColumn Property="x => x.Hospitalized" Title="Hospitalization Rates" Sortable="true" Filterable="false" />
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="StateDailyTotal" />
+            </PagerContent>
+        </MudDataGrid>
+    </MudStack>
+}
+
+@code
+{
+    MudDatePicker? _datePicker;
+    HashSet<StateDailyTotal> _selectedItems = new();
+    HashSet<StateDailyTotal> _filterItems = new();
+    FilterDefinition<StateDailyTotal> _filterDefinition = new();
+    string _icon = Icons.Material.Outlined.FilterAlt;
+    bool _filterOpen = false;
+    bool _selectAll = true;
+
+    private void SetDate(MouseEventArgs args)
+    {
+        ViewModel.CurrentDate = new DateTime(2011, 6, 12);
+        _datePicker.GoToDate(ViewModel.CurrentDate.Value);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _selectedItems = ViewModel.DailyTotals.ToHashSet();
+        _filterItems = ViewModel.DailyTotals.ToHashSet();
+        _filterDefinition = new FilterDefinition<StateDailyTotal>
+            {
+                FilterFunction = x => _filterItems.Contains(x)
+            };
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // if(firstRender)
+        // {
+        //     if(_datePicker != null)
+        //     {
+        //         _datePicker.GoToDate();
+        //     }
+        // }
+
+        if (_datePicker != null && ViewModel?.CurrentDate != null)
+        {
+            _datePicker.GoToDate(ViewModel.CurrentDate.Value);
+        }
+
+        base.OnAfterRender(firstRender);
+    }
+
+    void DaySelected(DateTime? newDate)
+    {
+
+    }
+
+    void OpenFilter()
+    {
+        _filterOpen = true;
+    }
+
+    private async Task ApplyFilterAsync(FilterContext<StateDailyTotal> context)
+    {
+        _filterItems = _selectedItems.ToHashSet();
+        _icon = _filterItems.Count == ViewModel.DailyTotals.Count() ? Icons.Material.Outlined.FilterAlt : Icons.Material.Filled.FilterAlt;
+        await context.Actions.ApplyFilterAsync(_filterDefinition);
+        _filterOpen = false;
+    }
+
+    private async Task ClearFilterAsync(FilterContext<StateDailyTotal> context)
+    {
+        _selectedItems = ViewModel.DailyTotals.ToHashSet();
+        _filterItems = ViewModel.DailyTotals.ToHashSet();
+        _icon = Icons.Material.Outlined.FilterAlt;
+        await context.Actions.ClearFilterAsync(_filterDefinition);
+        _filterOpen = false;
+    }
+
+    private void SelectedChanged(bool value, StateDailyTotal item)
+    {
+        if (value)
+            _selectedItems.Add(item);
+        else
+            _selectedItems.Remove(item);
+
+        if (_selectedItems.Count == ViewModel.DailyTotals.Count())
+            _selectAll = true;
+        else
+            _selectAll = false;
+    }
+
+    private void SelectAll(bool value)
+    {
+        _selectAll = value;
+
+        if (value)
+        {
+            _selectedItems = ViewModel.DailyTotals.ToHashSet();
+        }
+        else
+        {
+            _selectedItems.Clear();
+        }
+    }
+}
