@@ -1,28 +1,39 @@
-﻿using CovidTracker.Core.Models;
+﻿using CovidTracker.Core.Configuration;
+using CovidTracker.Core.Models;
 using CovidTracker.Core.Services;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace CovidTracker.Core.Repositories;
 
 public class CovidStateDataRepository : ICovidStateDataRepository
 {
-    public CovidStateDataRepository(ICovidTrackingService covidTrackingService)
+    public CovidStateDataRepository(ICovidTrackingService covidTrackingService, IOptions<CacheOptions> cacheOptions, IMemoryCache memoryCache)
     {
         CovidTrackingService = covidTrackingService;
+        CacheSettings = cacheOptions.Value;
+        MemoryCache = memoryCache;
     }
 
-    private const int CacheDurationInMinutes = 24 * 60; // Once a day, but is there a reason to ever expire this cache?
     private ICovidTrackingService CovidTrackingService { get; }
-    private List<StateDailyTotal>? AllStateData { get; set; }
-    private DateTime? LastRetrieved { get; set; }
+    private CacheOptions CacheSettings { get; }
+    private IMemoryCache MemoryCache { get; }
 
     public async Task<List<StateDailyTotal>> GetAllStateDataForDateAsync(DateOnly date)
     {
-        if (AllStateData == null || LastRetrieved?.AddMinutes(CacheDurationInMinutes) < DateTime.Now)
+        // pull the cached data to make sure it hasn't expired
+        MemoryCache.TryGetValue<List<StateDailyTotal>>(CacheSettings.StateDataCacheKey, out var cachedData);
+
+        if (cachedData == null)
         {
-            AllStateData = await CovidTrackingService.GetStateData();
-            LastRetrieved = DateTime.Now;
+            await Task.Delay(2000); //TODO: Remove this line
+            cachedData = await CovidTrackingService.GetStateData();
+            MemoryCache.Set(CacheSettings.StateDataCacheKey, cachedData, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CacheSettings.CacheDurationInMinutes)
+            });
         }
 
-        return AllStateData.Where(x => x.Date == date).ToList();
+        return cachedData.Where(x => x.Date == date).ToList();
     }
 }

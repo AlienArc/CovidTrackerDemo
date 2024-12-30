@@ -1,3 +1,4 @@
+using CovidTracker.Core.Configuration;
 using CovidTracker.Core.Models;
 using CovidTracker.Core.Repositories;
 using CovidTracker.Core.Services;
@@ -14,14 +15,20 @@ builder.Services.AddMudServices();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Configure options for the app.
+builder.Services.Configure<CacheOptions>(builder.Configuration.GetSection("CacheOptions"));
+
+// Add memory cache to the container.
+builder.Services.AddMemoryCache();
+
 // Add automapper the container.
 builder.Services.AddAutoMapper(typeof(StateDailyTotal));
 
 // Add services to the container.
-builder.Services.AddSingleton<ICovidTrackingService, CovidTrackingService>();
+builder.Services.AddScoped<ICovidTrackingService, CovidTrackingService>();
 
 // Add repositories to the container.
-builder.Services.AddSingleton<ICovidStateDataRepository, CovidStateDataRepository>();
+builder.Services.AddScoped<ICovidStateDataRepository, CovidStateDataRepository>();
 
 // Add ViewModels to the container.
 builder.Services.AddTransient<HomeViewModel>();
