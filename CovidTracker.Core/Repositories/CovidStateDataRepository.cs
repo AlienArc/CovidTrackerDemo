@@ -26,7 +26,6 @@ public class CovidStateDataRepository : ICovidStateDataRepository
 
         if (cachedData == null)
         {
-            await Task.Delay(2000); //TODO: Remove this line
             cachedData = await CovidTrackingService.GetStateData();
             MemoryCache.Set(CacheSettings.StateDataCacheKey, cachedData, new MemoryCacheEntryOptions
             {

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CovidTracker.Web", "CovidTr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CovidTracker.Core", "CovidTracker.Core\CovidTracker.Core.csproj", "{C4EDFB5E-8EEE-498D-B123-4E72CEB47605}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CovidTracker.Core.Tests", "CovidTracker.Core.Tests\CovidTracker.Core.Tests.csproj", "{AA87DE8A-3DCB-435F-A196-839C08A063FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{C4EDFB5E-8EEE-498D-B123-4E72CEB47605}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4EDFB5E-8EEE-498D-B123-4E72CEB47605}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4EDFB5E-8EEE-498D-B123-4E72CEB47605}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA87DE8A-3DCB-435F-A196-839C08A063FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA87DE8A-3DCB-435F-A196-839C08A063FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA87DE8A-3DCB-435F-A196-839C08A063FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA87DE8A-3DCB-435F-A196-839C08A063FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +38,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{7D20867B-4E5E-4EAC-98EE-FE984773BB75} = {CB35CD28-CFE6-488B-8622-17B0A41265A3}
 		{C4EDFB5E-8EEE-498D-B123-4E72CEB47605} = {CB35CD28-CFE6-488B-8622-17B0A41265A3}
+		{AA87DE8A-3DCB-435F-A196-839C08A063FA} = {6E362C84-5053-44C3-ABB6-5AFBEF2EC126}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD51921E-3108-4D6E-AAFD-5621081BA12F}
