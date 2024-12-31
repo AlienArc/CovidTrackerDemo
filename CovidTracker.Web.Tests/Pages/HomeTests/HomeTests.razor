@@ -8,8 +8,8 @@
 
 @code {
 
-    private List<StateDailyTotalViewModel> MapperDailyTotals { get; set; }
-    private CovidDataSummary GetCovidDataSummaryResults { get; set; }
+    private List<StateDailyTotalViewModel>? MapperDailyTotals { get; set; }
+    private CovidDataSummary? GetCovidDataSummaryResults { get; set; }
 
     private void HomeTestsSetup(Bunit.TestContext context)
     {
@@ -89,7 +89,7 @@
         using var context = new Bunit.TestContext();
 
         HomeTestsSetup(context);
-                
+
         var subject = context.Render(@<HomeWrapper />);
 
         var homeComponent = subject.FindComponent<Home>();
@@ -97,7 +97,7 @@
         var dataRepository = Fixture.Freeze<ICovidStateDataRepository>();
         dataRepository
             .Received(1)
-            .GetAllStateDataForDateAsync(Arg.Is(GetCovidDataSummaryResults.DateOfLatestRecord));
+            .GetAllStateDataForDateAsync(Arg.Is(GetCovidDataSummaryResults!.DateOfLatestRecord));
 
     }
 

@@ -26,12 +26,14 @@ public class CovidStateDataRepositoryTests : FixtureTestBase
             .Returns(ci => CacheOptions);
 
         var memoryCache = Fixture.Freeze<IMemoryCache>();
+#pragma warning disable CS8601 // Possible null reference assignment.
         memoryCache.TryGetValue(Arg.Any<string>(), out Arg.Any<List<StateDailyTotal>>())
             .Returns(ci =>
             {
                 ci[1] = MemoryCacheStateData;
                 return MemoryCacheResult;
             });
+#pragma warning restore CS8601 // Possible null reference assignment.
     }
 
     private void SetDefaultTestParameters()
