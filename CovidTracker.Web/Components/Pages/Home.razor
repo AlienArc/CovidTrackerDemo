@@ -57,10 +57,10 @@
                     </MudPopover>
                 </FilterTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.TotalCasesFormated" Title="Total" Sortable="true" Filterable="true" />
-            <PropertyColumn Property="x => x.PositiveCasesFormated" Title="Positive" Sortable="true" Filterable="true" />
-            <PropertyColumn Property="x => x.NegativeCasesFormated" Title="Negative" Sortable="true" Filterable="true" />
-            <PropertyColumn Property="x => x.HospitalizationRateFormated" Title="Hospitalization Rates" Sortable="true" Filterable="true" />
+            <PropertyColumn Property="x => x.TotalCases" Format="N0" Title="Total" Sortable="true" Filterable="true" />
+            <PropertyColumn Property="x => x.PositiveCases" Format="N0" Title="Positive" Sortable="true" Filterable="true" />
+            <PropertyColumn Property="x => x.NegativeCases" Format="N0" Title="Negative" Sortable="true" Filterable="true" />
+            <PropertyColumn Property="x => x.HospitalizationRate" Format="P2" Title="Hospitalization Rates" Sortable="true" Filterable="true" />
         </Columns>
         <LoadingContent>
             <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center">
