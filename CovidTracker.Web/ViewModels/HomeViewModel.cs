@@ -13,6 +13,7 @@ public class HomeViewModel(ICovidStateDataRepository dataRepository, IMapper map
     public DateTime? CurrentDate { get; set; }
     public DateTime? MaxDate { get; set; }
     public DateTime? MinDate { get; set; }
+    public List<string> States { get; set; } = new();
 
     public override async Task OnInitializedAsync()
     {
@@ -31,6 +32,7 @@ public class HomeViewModel(ICovidStateDataRepository dataRepository, IMapper map
         var summary = await DataRepository.GetCovidDataSummary();
         MaxDate = summary.DateOfLatestRecord.ToDateTime(TimeOnly.MinValue);
         MinDate = summary.DateOfEaliestRecord.ToDateTime(TimeOnly.MinValue);
+        States = summary.States;
         if (CurrentDate == null || CurrentDate == DefaultDate)
         {
             CurrentDate = MaxDate;

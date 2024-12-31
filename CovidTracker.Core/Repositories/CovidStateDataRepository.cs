@@ -31,7 +31,8 @@ public class CovidStateDataRepository : ICovidStateDataRepository
         return new CovidDataSummary
         {
             DateOfEaliestRecord = allCachedData.Min(r => r.Date),
-            DateOfLatestRecord = allCachedData.Max(r => r.Date)
+            DateOfLatestRecord = allCachedData.Max(r => r.Date),
+            States = allCachedData.Select(r => r.State).Distinct().Order().ToList()
         };
     }
 

@@ -12,7 +12,7 @@
                 <FilterTemplate>
                     <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
                         <MudText Typo="Typo.body1">@ViewModel.CurrentDate?.ToString("M/d/yyyy")</MudText>
-                        <MudIconButton OnClick="@OpenDateFilter" Icon="@_icon" Size="@Size.Small" /> 
+                        <MudIconButton OnClick="@OpenDateFilter" Icon="@Icons.Material.Outlined.FilterAlt" Size="@Size.Small" /> 
                     </MudStack>
                     <MudOverlay Visible="_dateFilterOpen" LightBackground="false" OnClick="@(() => _dateFilterOpen = false)" />
                     <MudPopover Open="@_dateFilterOpen" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopCenter" Style="">
@@ -25,7 +25,7 @@
                                 PickerVariant="PickerVariant.Static"
                                  />
                             <MudStack Row="true" Justify="Justify.Center">
-                                <MudButton OnClick="@(() => ClearFilterAsync(context))" FullWidth="true">Cancel</MudButton>
+                                <MudButton OnClick="@(() => _dateFilterOpen = false)" FullWidth="true">Cancel</MudButton>
                             </MudStack>
                         </MudStack>
                     </MudPopover>
@@ -34,24 +34,24 @@
             <PropertyColumn Property="x => x.State" Title="State" Sortable="true">
                 <FilterTemplate>
                     <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
-                        <MudText Typo="Typo.body1">@StateFilterFriendlyName</MudText>
-                        <MudIconButton OnClick="@(() => _stateFilterOpen = true)" Icon="@_icon" Size="@Size.Small" />
-                        <MudIconButton OnClick="@(() => ClearFilterAsync(context))" Icon="@Icons.Material.Filled.FilterAltOff" Size="@Size.Small" />
+                        <MudText Typo="Typo.body1">@_stateFilterFriendlyName</MudText>
+                        <MudIconButton OnClick="@(() => _stateFilterOpen = true)" Icon="@Icons.Material.Outlined.FilterAlt" Size="@Size.Small" />
+                        <MudIconButton OnClick="@(() => ClearStateFilterAsync(context))" Icon="@Icons.Material.Filled.FilterAltOff" Size="@Size.Small" />
                     </MudStack>
                     <MudOverlay Visible="_stateFilterOpen" LightBackground="false" OnClick="@(() => _stateFilterOpen = false)" />
                     <MudPopover Open="@_stateFilterOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Style="width:150px">
                         <MudStack Spacing="0">
-                            <MudCheckBox T="bool" Label="Select All" Size="@Size.Small" Value="@_selectAll" ValueChanged="@SelectAllClicked" />
+                            <MudCheckBox T="bool" Label="Select All" Size="@Size.Small" Value="@_selectAll" ValueChanged="@StateFilterSelectAllClicked" />
                             <MudStack Spacing="0" Style="overflow-y:auto;max-height:250px">
                                 @foreach (var item in context.Items)
                                 {
-                                    <MudCheckBox T="bool" Label="@($"{item.State}")" Size="@Size.Small" Value="@(_selectedItems.Contains(item))"
-                                                    ValueChanged="@((value) => SelectedChanged(value, item))" />
+                                    <MudCheckBox T="bool" Label="@($"{item.State}")" Size="@Size.Small" Value="@(_selectedItems.Contains(item.State))"
+                                                 ValueChanged="@((value) => StateFilterSelectedChanged(value, item.State))" />
                                 }
                             </MudStack>
                             <MudStack Row="true">
-                                <MudButton OnClick="@(() => ClearFilterAsync(context))">Clear</MudButton>
-                                <MudButton Color="@Color.Primary" OnClick="@(() => ApplyFilterAsync(context))">Filter</MudButton>
+                                <MudButton OnClick="@(() => ClearStateFilterAsync(context))">Clear</MudButton>
+                                <MudButton Color="@Color.Primary" OnClick="@(() => ApplyStateFilterAsync(context))">Filter</MudButton>
                             </MudStack>
                         </MudStack>
                     </MudPopover>
@@ -87,15 +87,14 @@
 
     MudDataGrid<StateDailyTotalViewModel>? _dataGrid;
     MudDatePicker? _datePicker;
-    HashSet<StateDailyTotalViewModel> _selectedItems = new();
-    HashSet<StateDailyTotalViewModel> _filterItems = new();
-    bool _loading = false;
+    HashSet<string> _selectedItems = new();
+    HashSet<string> _filterItems = new();
     FilterDefinition<StateDailyTotalViewModel> _filterDefinition = new();
-    string _icon = Icons.Material.Outlined.FilterAlt;
+    bool _loading = false;
     bool _stateFilterOpen = false;
     bool _dateFilterOpen = false;
     bool _selectAll = true;
-    string StateFilterFriendlyName = "All";
+    string _stateFilterFriendlyName = "All";
 
     protected override void OnParametersSet()
     {
@@ -115,9 +114,9 @@
             await ViewModel.LoadDailyData();
             _loading = false;
 
-            _selectedItems = ViewModel.DailyTotals!.ToHashSet();
-            _filterItems = ViewModel.DailyTotals!.ToHashSet();
-            _filterDefinition = new FilterDefinition<StateDailyTotalViewModel> { FilterFunction = x => _filterItems.Contains(x) };
+            _selectedItems = ViewModel.States.ToHashSet();
+            _filterItems = ViewModel.States.ToHashSet();
+            _filterDefinition = new FilterDefinition<StateDailyTotalViewModel> { FilterFunction = x => _filterItems.Contains(x.State) };
 
             // Set the default sort on the datagrid
             await _dataGrid!.SetSortAsync("PositiveCases", SortDirection.Descending, x => x.PositiveCases, new MudBlazor.Utilities.NaturalComparer());
@@ -136,6 +135,7 @@
             _loading = true;
             StateHasChanged();
             await ViewModel.LoadDailyData();
+            var filterDefinitions = _dataGrid!.FilterDefinitions;
             _loading = false;
             _dateFilterOpen = false;
         }
@@ -144,8 +144,8 @@
     async Task OpenDateFilter()
     {
         _dateFilterOpen = true;
-        
-        do // Need to wait for the datepicker to be shown before scrolling to the selected date
+
+        do // Need to wait for the datepicker to be shown before scrolling to the selected date (alway need at least 1 delay)
         {
             await Task.Delay(10);
         } while (_datePicker == null);
@@ -157,20 +157,18 @@
         }
     }
 
-    async Task ApplyFilterAsync(FilterContext<StateDailyTotalViewModel> context)
+    async Task ApplyStateFilterAsync(FilterContext<StateDailyTotalViewModel> context)
     {
         _filterItems = _selectedItems.ToHashSet();
-        _icon = _filterItems.Count == ViewModel.DailyTotals!.Count() ? Icons.Material.Outlined.FilterAlt : Icons.Material.Filled.FilterAlt;
         SetStateFilterLabel();
         await context.Actions.ApplyFilterAsync(_filterDefinition);
         _stateFilterOpen = false;
     }
 
-    async Task ClearFilterAsync(FilterContext<StateDailyTotalViewModel> context)
+    async Task ClearStateFilterAsync(FilterContext<StateDailyTotalViewModel> context)
     {
-        _selectedItems = ViewModel.DailyTotals!.ToHashSet();
-        _filterItems = ViewModel.DailyTotals!.ToHashSet();
-        _icon = Icons.Material.Outlined.FilterAlt;
+        _selectedItems = ViewModel.States.ToHashSet();
+        _filterItems = ViewModel.States.ToHashSet();
         SetStateFilterLabel();
         await context.Actions.ClearFilterAsync(_filterDefinition);
         _stateFilterOpen = false;
@@ -182,47 +180,47 @@
         switch (_filterItems.Count)
         {
             case var filterCount when filterCount == totalItems:
-                StateFilterFriendlyName = "All";
+                _stateFilterFriendlyName = "All";
                 break;
             case 0:
-                StateFilterFriendlyName = "No States Selected";
+                _stateFilterFriendlyName = "No States Selected";
                 break;
             case 1:
-                StateFilterFriendlyName = _filterItems.First().State;
+                _stateFilterFriendlyName = _filterItems.First();
                 break;
             case var fc when fc <= 4:
-                StateFilterFriendlyName = string.Join(",", _filterItems.Select(i => i.State));
+                _stateFilterFriendlyName = string.Join(",", _filterItems);
                 break;
             case > 4:
-                StateFilterFriendlyName = "Multiple";
+                _stateFilterFriendlyName = "Multiple";
                 break;
             default:
-                StateFilterFriendlyName = "Unknown";
+                _stateFilterFriendlyName = "Unknown";
                 break;
         }
     }
 
-    void SelectedChanged(bool isAdd, StateDailyTotalViewModel item)
+    void StateFilterSelectedChanged(bool isAdd, string state)
     {
         if (isAdd)
         {
-            _selectedItems.Add(item);
+            _selectedItems.Add(state);
         }
         else
         {
-            _selectedItems.Remove(item);
+            _selectedItems.Remove(state);
         }
 
-        _selectAll = (_selectedItems.Count == ViewModel.DailyTotals!.Count());
+        _selectAll = (_selectedItems.Count == ViewModel.States.Count());
     }
 
-    void SelectAllClicked(bool isSelectAllChecked)
+    void StateFilterSelectAllClicked(bool isSelectAllChecked)
     {
         _selectAll = isSelectAllChecked;
 
         if (isSelectAllChecked)
         {
-            _selectedItems = ViewModel.DailyTotals!.ToHashSet();
+            _selectedItems = ViewModel.States.ToHashSet();
         }
         else
         {
