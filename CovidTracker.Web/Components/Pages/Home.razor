@@ -71,7 +71,7 @@
 
     MudDataGrid<StateDailyTotalViewModel>? _dataGrid;
     MudDatePicker? _datePicker;
-    bool _loading = false;
+    bool _loading = true;
     bool _dateFilterOpen = false;
 
     protected override async Task OnInitializedAsync()
@@ -106,9 +106,9 @@
     {
         if (newDate?.Date != ViewModel.CurrentDate?.Date)
         {
+            _dateFilterOpen = false;
             ViewModel.CurrentDate = newDate;
             await LoadData();
-            _dateFilterOpen = false;
         }
     }
 
