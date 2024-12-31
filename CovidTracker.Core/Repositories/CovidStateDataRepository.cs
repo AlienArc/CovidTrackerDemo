@@ -21,19 +21,37 @@ public class CovidStateDataRepository : ICovidStateDataRepository
 
     public async Task<List<StateDailyTotal>> GetAllStateDataForDateAsync(DateOnly date)
     {
+        var allCachedData = await GetCachedData();
+        return allCachedData.Where(x => x.Date == date).ToList();
+    }
+
+    public async Task<CovidDataSummary> GetCovidDataSummary()
+    {
+        var allCachedData = await GetCachedData();
+        return new CovidDataSummary
+        {
+            DateOfEaliestRecord = allCachedData.Min(r => r.Date),
+            DateOfLatestRecord = allCachedData.Max(r => r.Date)
+        };
+    }
+
+    private async Task<List<StateDailyTotal>> GetCachedData()
+    {
         // pull the cached data to make sure it hasn't expired
         MemoryCache.TryGetValue<List<StateDailyTotal>>(CacheSettings.StateDataCacheKey, out var cachedData);
 
         if (cachedData == null)
         {
-            await Task.Delay(2000); //TODO: Remove this line
-            cachedData = await CovidTrackingService.GetStateData();
-            MemoryCache.Set(CacheSettings.StateDataCacheKey, cachedData, new MemoryCacheEntryOptions
+            if (cachedData == null)
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CacheSettings.CacheDurationInMinutes)
-            });
+                cachedData = await CovidTrackingService.GetStateData();
+                MemoryCache.Set(CacheSettings.StateDataCacheKey, cachedData, new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CacheSettings.CacheDurationInMinutes)
+                });
+            }
         }
 
-        return cachedData.Where(x => x.Date == date).ToList();
+        return cachedData;
     }
 }

@@ -22,7 +22,7 @@ builder.Services.Configure<CacheOptions>(builder.Configuration.GetSection("Cache
 builder.Services.AddMemoryCache();
 
 // Add automapper the container.
-builder.Services.AddAutoMapper(typeof(StateDailyTotal));
+builder.Services.AddAutoMapper(typeof(StateDailyTotal), typeof(StateDailyTotalViewModel));
 
 // Add services to the container.
 builder.Services.AddScoped<ICovidTrackingService, CovidTrackingService>();
