@@ -3,7 +3,7 @@
 <PageTitle>About</PageTitle>
 
 <MudGrid Justify="Justify.FlexStart">
-    <MudItem xs="9" md="4" lg="6">
+    <MudItem xs="12" md="10" lg="8" xl="6">
         <MudPaper Outlined="true" Class="pa-4">
             <MudText Typo="Typo.h3" GutterBottom="true">About the App</MudText>
 
@@ -17,13 +17,17 @@
                     <MudText Typo="Typo.h5">Architecture</MudText>
                     <MudText Typo="Typo.body1">The application is broken into two projects separating the UI parts from the backend parts. 
                         It could easily be broken up further if the complexity so demanded. 
-                        Though was given to how each piece could be tested and how to maintain separation of concerns.
+                        Thought was given to how each piece could be tested and how to maintain separation of concerns.
                         In general best practices were applied for this level of application.</MudText>
                 </MudListItem>
                 <MudListItem Icon="@Icons.Material.Outlined.CheckCircleOutline" IconColor="Color.Success">
                     <MudText Typo="Typo.h5">Unit Tests</MudText>
                     <MudText Typo="Typo.body1">The site code was architected to make it easy to unit test by using interfaces and avoiding hard coded dependencies. There were some basic unit tests created for for the UI and the backend components. Best practices were used as well as many third party libraries to minimize the amount of code needed.</MudText>
                 </MudListItem>
+                <MudListItem Icon="@Icons.Material.Outlined.Timeline" IconColor="Color.Warning">
+                    <MudText Typo="Typo.h5">CI/CD</MudText>
+                    <MudText Typo="Typo.body1">The site is being deployed to an Azure Web App on Linux via GitHub actions.</MudText>
+                </MudListItem>                
                 <MudListItem Icon="@Icons.Material.Outlined.Storage" IconColor="Color.Secondary">
                     <MudText Typo="Typo.h5">Data Caching</MudText>
                     <MudText Typo="Typo.body1">Since the data for the site is stable and the endpoints available can return multiple MB in a single call, the returned data is being cached using Microsoft's memory cache.</MudText>
@@ -57,6 +61,11 @@
                 </MudListItem>
             </MudList>
         </MudPaper>
+        <MudStack Justify="Justify.FlexEnd" Class="pt-2 pr-1">
+            <MudText Style="" Typo="Typo.caption" Align="Align.Left">Copyright Alien Arc Technologies, Inc. @DateTime.Now.ToString("yyyy")</MudText>
+        </MudStack>
+    </MudItem>
+    <MudItem xs="12">
     </MudItem>
 </MudGrid>
 
