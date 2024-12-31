@@ -1,0 +1,65 @@
+﻿@page "/about"
+
+<PageTitle>About</PageTitle>
+
+<MudGrid Justify="Justify.FlexStart">
+    <MudItem xs="9" md="4" lg="6">
+        <MudPaper Outlined="true" Class="pa-4">
+            <MudText Typo="Typo.h3" GutterBottom="true">About the App</MudText>
+
+            <MudText Typo="Typo.body1" Class="mb-4">This application was created to show off basic competency with .NET Blazor. The code and architecture are clean and allow easy future maintenance. This application was completed in a few hours and should not be considered production ready. There was only enough time allotted to show some basic techniques and core competencies. </MudText>
+
+            <MudText Typo="Typo.body1">The code can be found on GitHub: <MudLink Href="https://github.com/AlienArc/CovidTrackerDemo">github.com/AlienArc/CovidTrackerDemo</MudLink></MudText>
+
+            <MudText Typo="Typo.h4" Class="mt-4">Notable Features:</MudText>
+            <MudList T="string">
+                <MudListItem Icon="@Icons.Material.Outlined.Architecture" IconColor="Color.Info">
+                    <MudText Typo="Typo.h5">Architecture</MudText>
+                    <MudText Typo="Typo.body1">The application is broken into two projects separating the UI parts from the backend parts. 
+                        It could easily be broken up further if the complexity so demanded. 
+                        Though was given to how each piece could be tested and how to maintain separation of concerns.
+                        In general best practices were applied for this level of application.</MudText>
+                </MudListItem>
+                <MudListItem Icon="@Icons.Material.Outlined.CheckCircleOutline" IconColor="Color.Success">
+                    <MudText Typo="Typo.h5">Unit Tests</MudText>
+                    <MudText Typo="Typo.body1">The site code was architected to make it easy to unit test by using interfaces and avoiding hard coded dependencies. There were some basic unit tests created for for the UI and the backend components. Best practices were used as well as many third party libraries to minimize the amount of code needed.</MudText>
+                </MudListItem>
+                <MudListItem Icon="@Icons.Material.Outlined.Storage" IconColor="Color.Secondary">
+                    <MudText Typo="Typo.h5">Data Caching</MudText>
+                    <MudText Typo="Typo.body1">Since the data for the site is stable and the endpoints available can return multiple MB in a single call, the returned data is being cached using Microsoft's memory cache.</MudText>
+                </MudListItem>
+                <MudListItem Icon="@Icons.Material.Outlined.Settings" IconColor="Color.Primary">
+                    <MudText Typo="Typo.h5">App Configuration</MudText>
+                    <MudText Typo="Typo.body1">While the application doesn't have a real need for configuration options, a cache timout parameter was added to demonstrate how configurations could be managed using the IOptions pattern.</MudText>
+                </MudListItem>
+                <MudListItem Icon="@Icons.Material.Outlined.Route" IconColor="Color.Warning">
+                    <MudText Typo="Typo.h5">Routing with parameters</MudText>
+                    <MudText Typo="Typo.body1">The statistics page can accept optional routing parameters.</MudText>
+                    <MudLink Href="/2020-02-15">Here is a link for 2/15/2020</MudLink>
+                </MudListItem>
+                <MudListItem Icon="@Icons.Material.Outlined.Code" IconColor="Color.Tertiary">
+                    <MudText Typo="Typo.h5">Custom Filter Component</MudText>
+                    <MudText Typo="Typo.body1">A custom MudDataGrid column filter template for a better filtering experience.</MudText>
+                    <MudLink Href="https://github.com/AlienArc/CovidTrackerDemo">Here is a link to the component</MudLink>
+                </MudListItem>
+                <MudListItem Icon="@Icons.Material.Outlined.LocalLibrary" IconColor="Color.Error">
+                    <MudText Typo="Typo.h5">Third Party Libraries</MudText>
+                    <MudText Typo="Typo.body1">Where it made sense, third party libraries were used to keep from re-inventing the wheel.</MudText>
+                    <MudText Typo="Typo.body1">The libraries used include:</MudText>
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.body2"><MudLink Href="https://mudblazor.com">MudBlazor</MudLink> a Material Design component framework for Blazor.</MudText>
+                        <MudText Typo="Typo.body2"><MudLink Href="https://automapper.org">AutoMapper</MudLink> - A library for getting rid of code that mapped one object to another.</MudText>
+                        <MudText Typo="Typo.body2"><MudLink Href="https://nunit.org">nUnit</MudLink> - A a unit-testing framework for all .Net languages.</MudText>
+                        <MudText Typo="Typo.body2"><MudLink Href="https://github.com/AutoFixture/AutoFixture">AutoFixture</MudLink> library for making unit test creation easier.</MudText>
+                        <MudText Typo="Typo.body2"><MudLink Href="https://nsubstitute.github.io">nSubstitute</MudLink> - Another unit-testing framework for easier mocking.</MudText>
+                        <MudText Typo="Typo.body2"><MudLink Href="https://fluentassertions.com">Fluent Assertions</MudLink> - Yet another unit-testing framework for easier asserting.</MudText>
+                    </MudStack>
+                </MudListItem>
+            </MudList>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+
+@code {
+}

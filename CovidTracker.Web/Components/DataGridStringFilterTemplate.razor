@@ -1,0 +1,115 @@
+﻿@typeparam T
+
+<MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+    <MudText Typo="Typo.body1">@_columnLabel</MudText>
+    <MudIconButton OnClick="@(() => _filterOpen = true)" Icon="@Icons.Material.Outlined.FilterAlt" Size="@Size.Small" />
+    <MudIconButton OnClick="@(() => SetFilterAsync(true))" Icon="@Icons.Material.Filled.FilterAltOff" Size="@Size.Small" />
+</MudStack>
+<MudOverlay Visible="_filterOpen" LightBackground="false" OnClick="@(() => _filterOpen = false)" />
+<MudPopover Open="@_filterOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Style="width:150px">
+    <MudStack Spacing="0">
+        <MudCheckBox T="bool" Label="Select All" Size="@Size.Small" Value="@_selectAll" ValueChanged="@SelectAllClicked" />
+        <MudStack Spacing="0" Style="overflow-y:auto;max-height:250px">
+            @if (Context != null && Context.Items != null && Context.Items.Any())
+            {
+                foreach (var item in Context.Items)
+                {
+                    <MudCheckBox T="bool" Label="@($"{GetStringFromType(item)}")" Size="@Size.Small" Value="@(_selectedItems.Contains(GetStringFromType(item)))"
+                    ValueChanged="@((value) => SelectedChanged(value, GetStringFromType(item)))" />
+                }
+            }
+        </MudStack>
+        <MudStack Row="true">
+            <MudButton OnClick="@(() => SetFilterAsync(true))">Clear</MudButton>
+            <MudButton Color="@Color.Primary" OnClick="@(() => SetFilterAsync(false))">Filter</MudButton>
+        </MudStack>
+    </MudStack>
+</MudPopover>
+
+@code {
+    [Parameter]
+    public FilterContext<T>? Context { get; set; }
+
+    [Parameter]
+    public List<string> AllItems { get; set; } = new();
+
+    [Parameter]
+    public Func<T, string> GetStringFromType { get; set; } = (s) => s?.ToString() ??  string.Empty;
+
+    [Parameter]
+    public Func<int, Func<List<string>>, string> GetColumnLabel { get; set; } = (t, s) => "No Label Set";
+
+    bool _filterOpen = false;
+    bool _selectAll = true;
+    string _columnLabel = string.Empty;
+    HashSet<string> _selectedItems = new();
+    HashSet<string> _filterItems = new();
+    FilterDefinition<T> _filterDefinition = new();
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _selectedItems = AllItems.ToHashSet();
+            _filterItems = AllItems.ToHashSet();
+            _filterDefinition = new FilterDefinition<T> { FilterFunction = x => _filterItems.Contains(GetStringFromType(x)) };
+            _columnLabel = GetColumnLabel(AllItems.Count, () => _selectedItems.ToList());
+            StateHasChanged();
+        }
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    // async Task ApplyFilterAsync()
+    // {
+    //     _filterItems = _selectedItems.ToHashSet();
+    //     await SetFilterAsync();
+    // }
+
+    // async Task ClearFilterAsync()
+    // {
+    //     _selectedItems = AllItems!.ToHashSet();
+    //     _filterItems = AllItems!.ToHashSet();
+    //     await SetFilterAsync();
+    // }
+
+    async Task SetFilterAsync(bool clearFilter)
+    {
+        _selectedItems = clearFilter ? AllItems.ToHashSet() : _selectedItems;
+        _filterItems = clearFilter ? AllItems.ToHashSet() : _selectedItems.ToHashSet();
+
+        _columnLabel = GetColumnLabel(AllItems.Count, () => _selectedItems.ToList());
+        if (Context?.Actions != null)
+        {
+            await Context.Actions.ApplyFilterAsync(_filterDefinition);
+        }
+        _filterOpen = false;
+    }
+
+    void SelectedChanged(bool isAdd, string item)
+    {
+        if (isAdd)
+        {
+            _selectedItems.Add(item);
+        }
+        else
+        {
+            _selectedItems.Remove(item);
+        }
+
+        _selectAll = (_selectedItems.Count == AllItems.Count());
+    }
+
+    void SelectAllClicked(bool isSelectAllChecked)
+    {
+        _selectAll = isSelectAllChecked;
+
+        if (isSelectAllChecked)
+        {
+            _selectedItems = AllItems.ToHashSet();
+        }
+        else
+        {
+            _selectedItems.Clear();
+        }
+    }
+}
