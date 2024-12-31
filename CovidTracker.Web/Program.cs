@@ -21,6 +21,8 @@ builder.Services.Configure<CacheOptions>(builder.Configuration.GetSection("Cache
 // Add memory cache to the container.
 builder.Services.AddMemoryCache();
 
+builder.Services.AddHttpClient();
+
 // Add automapper the container.
 builder.Services.AddAutoMapper(typeof(StateDailyTotal), typeof(StateDailyTotalViewModel));
 

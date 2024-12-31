@@ -1,0 +1,15 @@
+global using AutoFixture;
+global using AutoFixture.AutoNSubstitute;
+global using CovidTracker.Core.Dtos;
+global using CovidTracker.Core.Mappers;
+global using CovidTracker.Core.Models;
+global using CovidTracker.Core.Services;
+global using NUnit;
+global using NUnit.Framework;
+global using NSubstitute;
+global using FluentAssertions;
+global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using System.Text;
+global using System.Threading.Tasks;
