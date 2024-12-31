@@ -59,19 +59,6 @@
         return base.OnAfterRenderAsync(firstRender);
     }
 
-    // async Task ApplyFilterAsync()
-    // {
-    //     _filterItems = _selectedItems.ToHashSet();
-    //     await SetFilterAsync();
-    // }
-
-    // async Task ClearFilterAsync()
-    // {
-    //     _selectedItems = AllItems!.ToHashSet();
-    //     _filterItems = AllItems!.ToHashSet();
-    //     await SetFilterAsync();
-    // }
-
     async Task SetFilterAsync(bool clearFilter)
     {
         _selectedItems = clearFilter ? AllItems.ToHashSet() : _selectedItems;
