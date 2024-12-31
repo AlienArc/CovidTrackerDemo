@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CovidTracker.Core", "CovidT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CovidTracker.Core.Tests", "CovidTracker.Core.Tests\CovidTracker.Core.Tests.csproj", "{AA87DE8A-3DCB-435F-A196-839C08A063FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CovidTracker.Web.Tests", "CovidTracker.Web.Tests\CovidTracker.Web.Tests.csproj", "{76A750FD-2748-4999-A1D0-8F0E2520B7D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CovidTracker.Testing", "CovidTracker.Testing\CovidTracker.Testing.csproj", "{27DDF01C-23DC-42C9-AB2F-7AECBCF80EB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +35,14 @@ Global
 		{AA87DE8A-3DCB-435F-A196-839C08A063FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA87DE8A-3DCB-435F-A196-839C08A063FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA87DE8A-3DCB-435F-A196-839C08A063FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76A750FD-2748-4999-A1D0-8F0E2520B7D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76A750FD-2748-4999-A1D0-8F0E2520B7D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76A750FD-2748-4999-A1D0-8F0E2520B7D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76A750FD-2748-4999-A1D0-8F0E2520B7D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27DDF01C-23DC-42C9-AB2F-7AECBCF80EB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27DDF01C-23DC-42C9-AB2F-7AECBCF80EB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27DDF01C-23DC-42C9-AB2F-7AECBCF80EB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27DDF01C-23DC-42C9-AB2F-7AECBCF80EB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +51,8 @@ Global
 		{7D20867B-4E5E-4EAC-98EE-FE984773BB75} = {CB35CD28-CFE6-488B-8622-17B0A41265A3}
 		{C4EDFB5E-8EEE-498D-B123-4E72CEB47605} = {CB35CD28-CFE6-488B-8622-17B0A41265A3}
 		{AA87DE8A-3DCB-435F-A196-839C08A063FA} = {6E362C84-5053-44C3-ABB6-5AFBEF2EC126}
+		{76A750FD-2748-4999-A1D0-8F0E2520B7D5} = {6E362C84-5053-44C3-ABB6-5AFBEF2EC126}
+		{27DDF01C-23DC-42C9-AB2F-7AECBCF80EB6} = {6E362C84-5053-44C3-ABB6-5AFBEF2EC126}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD51921E-3108-4D6E-AAFD-5621081BA12F}

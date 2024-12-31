@@ -1,0 +1,12 @@
+﻿@* 
+    This wrapper file allows embedding the `MudBlazor.MudPopoverProvider` required for the page. This is typically provided by the MainLayout, which is not created in the test context.
+ *@
+<MudBlazor.MudPopoverProvider></MudBlazor.MudPopoverProvider>
+<Home PageDateFilter=@PageDateFilter />
+
+@code
+{
+    [Parameter]
+    public DateTime? PageDateFilter { get; set; }
+
+}

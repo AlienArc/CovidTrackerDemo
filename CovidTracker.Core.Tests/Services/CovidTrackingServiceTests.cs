@@ -11,6 +11,19 @@ public class CovidTrackingServiceTests : FixtureTestBase
     [SetUp]
     public void CovidTrackingServiceTestsSetup()
     {
+        SetDefaultTestParameters();
+
+        var mapper = Fixture.Freeze<IMapper>();
+        mapper.Map<List<StateDailyTotalDto>, List<StateDailyTotal>>(Arg.Any<List<StateDailyTotalDto>>())
+            .Returns(ci => MapResult);
+
+        var chf = Fixture.Freeze<IHttpClientFactory>();
+        chf.CreateClient()
+            .Returns(ci => new HttpClient(new MockHttpMessageHandler(ResponseMessage!)));
+    }
+
+    private void SetDefaultTestParameters()
+    {
         ResponseMessage = new HttpResponseMessage()
         {
             StatusCode = System.Net.HttpStatusCode.OK,
@@ -18,12 +31,6 @@ public class CovidTrackingServiceTests : FixtureTestBase
         };
 
         MapResult = new List<StateDailyTotal>();
-
-        var mapper = Fixture.Freeze<IMapper>();
-        mapper.Map<List<StateDailyTotalDto>, List<StateDailyTotal>>(Arg.Any<List<StateDailyTotalDto>>())
-            .Returns(ci => MapResult);
-        var chf = Fixture.Freeze<IHttpClientFactory>();
-        chf.CreateClient().Returns(ci => new HttpClient(new MockHttpMessageHandler(ResponseMessage!)));
     }
 
     [TearDown]
@@ -34,7 +41,7 @@ public class CovidTrackingServiceTests : FixtureTestBase
     }
 
     [Test]
-    public async Task GetStateData_ReturnsExpectedResult()
+    public async Task GetStateData_ReturnsMapResult()
     {
         MapResult = new List<StateDailyTotal>
         {

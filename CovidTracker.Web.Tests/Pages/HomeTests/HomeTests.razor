@@ -1,0 +1,104 @@
+﻿@using AutoMapper
+@using CovidTracker.Core.Models
+@using CovidTracker.Core.Repositories
+@using CovidTracker.Web.ViewModels
+@using MudBlazor
+@using MudBlazor.Services
+@inherits AutoFixtureRazorTestBase
+
+@code {
+
+    private List<StateDailyTotalViewModel> MapperDailyTotals { get; set; }
+    private CovidDataSummary GetCovidDataSummaryResults { get; set; }
+
+    private void HomeTestsSetup(Bunit.TestContext context)
+    {
+        MapperDailyTotals = Fixture.Create<List<StateDailyTotalViewModel>>();
+        GetCovidDataSummaryResults = Fixture.Create<CovidDataSummary>();
+
+        var dataRepository = Fixture.Freeze<ICovidStateDataRepository>();
+        dataRepository.GetAllStateDataForDateAsync(Arg.Any<DateOnly>())
+            .Returns(ci => new List<StateDailyTotal>());
+        dataRepository.GetCovidDataSummary()
+            .Returns(ci => Task.FromResult(GetCovidDataSummaryResults));
+
+        var mapper = Fixture.Freeze<IMapper>();
+        mapper.Map<List<StateDailyTotal>, List<StateDailyTotalViewModel>>(Arg.Any<List<StateDailyTotal>>())
+            .Returns(ci => MapperDailyTotals);
+
+        var viewModel = Fixture.Build<HomeViewModel>()
+            .Without(v => v.CurrentDate)
+            .Create();
+        Fixture.Inject(viewModel);
+
+        context.Services.AddSingleton<HomeViewModel>(viewModel);
+        context.Services.AddSingleton<IMapper>(mapper);
+        context.Services.AddSingleton<ICovidStateDataRepository>(dataRepository);
+
+        SetupMudBlazor(context);
+    }
+
+    [Test]
+    public void MudDataGrid_Items_Matches_MapperResults()
+    {
+
+        using var context = new Bunit.TestContext();
+
+        HomeTestsSetup(context);
+
+        var subject = context.Render(@<HomeWrapper />);
+
+        var grid = subject.FindComponents<MudDataGrid<StateDailyTotalViewModel>>();
+
+        var itemsParameter = grid.First().Instance.Items;
+        if (itemsParameter is List<StateDailyTotalViewModel> itemData)
+        {
+            itemData.Should().BeEquivalentTo(MapperDailyTotals);
+        }
+        else
+        {
+            Assert.Fail("Items Not Set");
+        }
+    }
+
+    [Test]
+    public void PageDateFilter_PassedTo_CovidStateDataRepository_GetAllStateDataForDateAsync()
+    {
+
+        using var context = new Bunit.TestContext();
+
+        HomeTestsSetup(context);
+
+        var requestDate = Fixture.Create<DateTime>();
+
+        var subject = context.Render(@<HomeWrapper PageDateFilter="@requestDate" />);
+
+        var homeComponent = subject.FindComponent<Home>();
+
+        var dataRepository = Fixture.Freeze<ICovidStateDataRepository>();
+        dataRepository
+            .Received(1)
+            .GetAllStateDataForDateAsync(Arg.Is(DateOnly.FromDateTime(requestDate)));
+
+    }
+
+    [Test]
+    public void NoPageDateFilter_CurrentDate_SetTo_GetCovidDataSummaryResults_DateOfLatestRecord()
+    {
+
+        using var context = new Bunit.TestContext();
+
+        HomeTestsSetup(context);
+                
+        var subject = context.Render(@<HomeWrapper />);
+
+        var homeComponent = subject.FindComponent<Home>();
+
+        var dataRepository = Fixture.Freeze<ICovidStateDataRepository>();
+        dataRepository
+            .Received(1)
+            .GetAllStateDataForDateAsync(Arg.Is(GetCovidDataSummaryResults.DateOfLatestRecord));
+
+    }
+
+}

@@ -15,40 +15,38 @@ public class CovidStateDataRepositoryTests : FixtureTestBase
     [SetUp]
     public void CovidStateDataRepositoryTestsSetup()
     {
-        TrackingServiceStateData = new List<StateDailyTotal>();
-        CacheOptions = new CacheOptions { CacheDurationInMinutes = 1 };
-        MemoryCacheStateData = null;
-        MemoryCacheResult = false;
+        SetDefaultTestParameters();
 
-        var cts = Fixture.Freeze<ICovidTrackingService>();
-        cts.GetStateData()
+        var covidTrackingService = Fixture.Freeze<ICovidTrackingService>();
+        covidTrackingService.GetStateData()
             .Returns(ci => Task.FromResult(TrackingServiceStateData));
 
-        var co = Fixture.Freeze<IOptions<CacheOptions>>();
-        co.Value.Returns(ci => CacheOptions);
+        var cacheOptions = Fixture.Freeze<IOptions<CacheOptions>>();
+        cacheOptions.Value
+            .Returns(ci => CacheOptions);
 
-        var mc = Fixture.Freeze<IMemoryCache>();
-        mc.TryGetValue(Arg.Any<string>(), out Arg.Any<List<StateDailyTotal>>())
+        var memoryCache = Fixture.Freeze<IMemoryCache>();
+        memoryCache.TryGetValue(Arg.Any<string>(), out Arg.Any<List<StateDailyTotal>>())
             .Returns(ci =>
             {
                 ci[1] = MemoryCacheStateData;
                 return MemoryCacheResult;
             });
+    }
 
+    private void SetDefaultTestParameters()
+    {
+        TrackingServiceStateData = new List<StateDailyTotal>();
+        CacheOptions = new CacheOptions { CacheDurationInMinutes = 1 };
+        MemoryCacheStateData = null;
+        MemoryCacheResult = false;
     }
 
     [Test]
     public async Task GetAllStateDataForDateAsync_NoCache_ReturnsApiData()
     {
-        var date = DateOnly.FromDateTime(Fixture.Create<DateTime>());
-        TrackingServiceStateData = new List<StateDailyTotal>
-        {
-            new StateDailyTotal
-            { 
-                Date = date,
-                State = "Missouri"
-            }
-        };
+        TrackingServiceStateData = Fixture.Create<List<StateDailyTotal>>();
+        var date = TrackingServiceStateData.First().Date;
 
         var subject = Fixture.Create<CovidStateDataRepository>();
 
@@ -60,25 +58,8 @@ public class CovidStateDataRepositoryTests : FixtureTestBase
     [Test]
     public async Task GetAllStateDataForDateAsync_NoCache_OnlyReturnsValidDay()
     {
-        var date = DateOnly.FromDateTime(Fixture.Create<DateTime>());
-        TrackingServiceStateData = new List<StateDailyTotal>
-        {
-            new StateDailyTotal
-            {
-                Date = date,
-                State = "Missouri"
-            },
-            new StateDailyTotal
-            {
-                Date = date.AddDays(-1),
-                State = "Missouri"
-            },
-            new StateDailyTotal
-            {
-                Date = date.AddDays(1),
-                State = "Missouri"
-            }
-        };
+        TrackingServiceStateData = Fixture.Create<List<StateDailyTotal>>();
+        var date = TrackingServiceStateData.First().Date;
 
         var subject = Fixture.Create<CovidStateDataRepository>();
 
@@ -91,25 +72,8 @@ public class CovidStateDataRepositoryTests : FixtureTestBase
     [Test]
     public async Task GetAllStateDataForDateAsync_NoCache_WritesServiceDataToCache()
     {
-        var date = DateOnly.FromDateTime(Fixture.Create<DateTime>());
-        TrackingServiceStateData = new List<StateDailyTotal>
-        {
-            new StateDailyTotal
-            {
-                Date = date,
-                State = "Missouri"
-            },
-            new StateDailyTotal
-            {
-                Date = date.AddDays(-1),
-                State = "Missouri"
-            },
-            new StateDailyTotal
-            {
-                Date = date.AddDays(1),
-                State = "Missouri"
-            }
-        };
+        TrackingServiceStateData = Fixture.Create<List<StateDailyTotal>>();
+        var date = TrackingServiceStateData.First().Date;
 
         var subject = Fixture.Create<CovidStateDataRepository>();
 
@@ -124,50 +88,28 @@ public class CovidStateDataRepositoryTests : FixtureTestBase
     [Test]
     public async Task GetAllStateDataForDateAsync_Cache_OnlyReturnsCacheData()
     {
-        var date = DateOnly.FromDateTime(Fixture.Create<DateTime>());
-        TrackingServiceStateData = new List<StateDailyTotal>
-        {
-            new StateDailyTotal
-            {
-                Date = date,
-                State = "Missouri"
-            },
-            new StateDailyTotal
-            {
-                Date = date,
-                State = "Missouri"
-            },
-            new StateDailyTotal
-            {
-                Date = date,
-                State = "Missouri"
-            }
-        };
-        MemoryCacheStateData = new List<StateDailyTotal>
-        {
-            new StateDailyTotal
-            {
-                Date = date,
-                State = "Missouri"
-            },
-            new StateDailyTotal
-            {
-                Date = date.AddDays(-1),
-                State = "Missouri"
-            },
-            new StateDailyTotal
-            {
-                Date = date.AddDays(1),
-                State = "Missouri"
-            }
-        };
+
+        var date = Fixture.Create<DateOnly>();
+
+        TrackingServiceStateData = Fixture
+            .Build<StateDailyTotal>()
+            .With(o => o.Date, date.AddDays(1))
+            .CreateMany(3)
+            .ToList();
+
+        MemoryCacheStateData = Fixture
+            .Build<StateDailyTotal>()
+            .With(o => o.Date, date)
+            .CreateMany(3)
+            .ToList();
+
         MemoryCacheResult = true;
 
         var subject = Fixture.Create<CovidStateDataRepository>();
 
         var result = await subject.GetAllStateDataForDateAsync(date);
 
-        result.Should().HaveCount(1);
+        result.Should().HaveCount(3);
     }
 
 

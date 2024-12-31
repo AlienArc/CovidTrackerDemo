@@ -1,4 +1,4 @@
-﻿namespace CovidTracker.Core.Tests;
+﻿namespace CovidTracker.Testing;
 
 public class MockHttpMessageHandler : HttpMessageHandler
 {

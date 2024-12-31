@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 
-namespace CovidTracker.Core.Tests;
+namespace CovidTracker.Testing;
 
-public abstract class MapperTestBase<T> where T : AutoMapper.Profile, new()
+public abstract class MapperTestBase<T> where T : Profile, new()
 {
     protected MapperConfiguration Config;
     protected IMapper Mapper;
